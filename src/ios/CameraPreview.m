@@ -80,7 +80,7 @@
         else {
                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Camera not started"];
         }
-
+        self.stopCamera = pluginResult;
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
