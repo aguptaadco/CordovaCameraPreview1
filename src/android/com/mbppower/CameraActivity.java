@@ -215,6 +215,7 @@ public class CameraActivity extends Fragment {
 
         if (cameraParameters != null) {
           mCamera.setParameters(cameraParameters);
+		  
         }
 
         cameraCurrentlyLocked = defaultCameraId;
@@ -223,6 +224,7 @@ public class CameraActivity extends Fragment {
 		mPreview.setCamera(mCamera, cameraCurrentlyLocked);
 	} else {
 		mPreview.switchCamera(mCamera, cameraCurrentlyLocked);
+		//mCamera.initPreview();
 		mCamera.startPreview();
 	}
 
@@ -285,6 +287,7 @@ public class CameraActivity extends Fragment {
 
 		if (cameraParameters != null) {
 			mCamera.setParameters(cameraParameters);
+			
 		}
 
 		cameraCurrentlyLocked = (cameraCurrentlyLocked + 1) % numberOfCameras;
@@ -293,6 +296,7 @@ public class CameraActivity extends Fragment {
 	    Log.d(TAG, "cameraCurrentlyLocked new: " + cameraCurrentlyLocked);
 
 		// Start the preview
+		//mCamera.initPreview();
 		mCamera.startPreview();
     }
 
@@ -301,6 +305,15 @@ public class CameraActivity extends Fragment {
 
       if (mCamera != null && cameraParameters != null) {
         mCamera.setParameters(cameraParameters);
+		Camera.Parameters parameters = mCamera.getParameters();
+		List<String>    focusModes = parameters.getSupportedFocusModes();
+			if(focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)){
+				parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);   
+			} else 
+			if(focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)){
+				parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+			}  
+		
       }
     }
 
@@ -376,7 +389,8 @@ public class CameraActivity extends Fragment {
 								    //get bitmap and compress
 								    Bitmap picture = loadBitmapFromView(view.findViewById(getResources().getIdentifier("frame_camera_cont", "id", appResourcesPackage)));
 								    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-								    picture.compress(Bitmap.CompressFormat.PNG, 80, stream);
+								    picture.compress(Bitmap.CompressFormat.WEBP, 10, stream);
+									
 
 									generatePictureFromView(originalPicture, picture);
 									canTakePicture = true;
@@ -529,7 +543,25 @@ class Preview extends RelativeLayout implements SurfaceHolder.Callback {
             mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
             setCameraDisplayOrientation();
             //mCamera.getParameters().setRotation(getDisplayOrientation());
-            //requestLayout();
+            requestLayout();
+			
+			/*Camera.Parameters params = mCamera.getParameters();
+            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+            mCamera.setParameters(params);*/
+			
+			
+			 /* Set Auto focus */ 
+			Camera.Parameters parameters = mCamera.getParameters();
+			List<String>    focusModes = parameters.getSupportedFocusModes();
+			if(focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)){
+				parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);   
+			} else 
+			if(focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)){
+				parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+			}   
+
+			mCamera.setParameters(parameters);
+	
         }
     }
 
@@ -601,7 +633,8 @@ class Preview extends RelativeLayout implements SurfaceHolder.Callback {
         setMeasuredDimension(width, height);
 
         if (mSupportedPreviewSizes != null) {
-            mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
+            //mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
+			mPreviewSize = getLargestPreviewSize(mSupportedPreviewSizes, width, height);
         }
     }
 
@@ -718,7 +751,23 @@ class Preview extends RelativeLayout implements SurfaceHolder.Callback {
         Log.d(TAG, "optimal preview size: w: " + optimalSize.width + " h: " + optimalSize.height);
         return optimalSize;
     }
-
+	
+    private Camera.Size getLargestPreviewSize(List<Camera.Size> sizes, int w, int h) {
+         if (sizes == null) return null;
+ 
+         Camera.Size optimalSize = null;
+ 
+         optimalSize = sizes.get(0);
+         for (int i = 0; i < sizes.size(); i++) {
+             if (sizes.get(i).width > optimalSize.width) {
+                 optimalSize = sizes.get(i);
+             }
+         }
+ 
+         Log.d(TAG, "largest preview size: w: " + optimalSize.width + " h: " + optimalSize.height);
+         return optimalSize;
+     }
+ 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 	    if(mCamera != null) {
 		    // Now that the size is known, set up the camera parameters and begin
@@ -727,7 +776,18 @@ class Preview extends RelativeLayout implements SurfaceHolder.Callback {
             parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
 		    requestLayout();
 		    //mCamera.setDisplayOrientation(90);
+			
+			List<String>    focusModes = parameters.getSupportedFocusModes();
+			if(focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)){
+				parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);   
+			} else 
+			if(focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)){
+				parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+			}   
 		    mCamera.setParameters(parameters);
+			//mCamera.initPreview();
+			
+			
 		    mCamera.startPreview();
 	    }
     }
@@ -746,7 +806,7 @@ class Preview extends RelativeLayout implements SurfaceHolder.Callback {
             // Convert YuV to Jpeg
             Rect rect = new Rect(0, 0, w, h);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            yuvImage.compressToJpeg(rect, 80, outputStream);
+            yuvImage.compressToJpeg(rect, 30, outputStream);
             return outputStream.toByteArray();
         }
         return data;

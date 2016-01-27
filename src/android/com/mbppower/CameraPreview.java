@@ -8,7 +8,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-
+import java.util.List;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -92,7 +92,9 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
 					fragment.tapToTakePicture = tapToTakePicture;
 					fragment.dragEnabled = dragEnabled;
 					fragment.setRect(x, y, width, height);
-
+					
+					
+					
 					//create or update the layout params for the container view
 					FrameLayout containerView = (FrameLayout)cordova.getActivity().findViewById(containerViewId);
 					if(containerView == null){
@@ -112,12 +114,24 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
 						containerView.setAlpha(Float.parseFloat(args.getString(8)));
 						containerView.bringToFront();
 					}
-
+					
+					
+					
 					//add the fragment to the container
 					FragmentManager fragmentManager = cordova.getActivity().getFragmentManager();
 					FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 					fragmentTransaction.add(containerView.getId(), fragment);
 					fragmentTransaction.commit();
+					
+					Camera camera = fragment.getCamera();
+					
+
+					Camera.Parameters params = camera.getParameters();
+					fragment.setCameraParameters(params);
+					
+					
+					
+					
 				}
 				catch(Exception e){
 					e.printStackTrace();
