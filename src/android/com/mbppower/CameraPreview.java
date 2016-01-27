@@ -212,6 +212,9 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
 
 	private boolean stopCamera(final JSONArray args, CallbackContext callbackContext) {
 		if(fragment == null){
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
 			return false;
 		}
 
@@ -220,7 +223,9 @@ public class CameraPreview extends CordovaPlugin implements CameraActivity.Camer
 		fragmentTransaction.remove(fragment);
 		fragmentTransaction.commit();
 		fragment = null;
-
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
 		return true;
 	}
 
