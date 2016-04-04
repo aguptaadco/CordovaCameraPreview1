@@ -256,6 +256,71 @@
     UIGraphicsEndImageContext();
     return normalizedImage;
 }
+- (double)radiansFromUIImageOrientation:(UIImageOrientation)orientation
+{
+    double radians;
+    
+    switch (orientation) {
+        case UIImageOrientationUp:
+        case UIImageOrientationUpMirrored:
+            radians = M_PI_2;
+            break;
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+            radians = 0.f;
+            break;
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            radians = M_PI;
+            break;
+        case UIImageOrientationDown:
+        case UIImageOrientationDownMirrored:
+            radians = -M_PI_2;
+            break;
+    }
+    
+    return radians;
+}
+
+-(CGImageRef) CGImageRotated:(CGImageRef) originalCGImage withRadiants:(double) radians
+{
+    CGSize imageSize = CGSizeMake(CGImageGetWidth(originalCGImage), CGImageGetHeight(originalCGImage));
+    CGSize rotatedSize;
+    if (radians == M_PI_2 || radians == -M_PI_2) {
+        rotatedSize = CGSizeMake(imageSize.height, imageSize.width);
+    } else {
+        rotatedSize = imageSize;
+    }
+    
+    double rotatedCenterX = rotatedSize.width / 2.f;
+    double rotatedCenterY = rotatedSize.height / 2.f;
+    
+    UIGraphicsBeginImageContextWithOptions(rotatedSize, NO, 1.f);
+    CGContextRef rotatedContext = UIGraphicsGetCurrentContext();
+    if (radians == 0.f || radians == M_PI) { // 0 or 180 degrees
+        CGContextTranslateCTM(rotatedContext, rotatedCenterX, rotatedCenterY);
+        if (radians == 0.0f) {
+            CGContextScaleCTM(rotatedContext, 1.f, -1.f);
+        } else {
+            CGContextScaleCTM(rotatedContext, -1.f, 1.f);
+        }
+        CGContextTranslateCTM(rotatedContext, -rotatedCenterX, -rotatedCenterY);
+    } else if (radians == M_PI_2 || radians == -M_PI_2) { // +/- 90 degrees
+        CGContextTranslateCTM(rotatedContext, rotatedCenterX, rotatedCenterY);
+        CGContextRotateCTM(rotatedContext, radians);
+        CGContextScaleCTM(rotatedContext, 1.f, -1.f);
+        CGContextTranslateCTM(rotatedContext, -rotatedCenterY, -rotatedCenterX);
+    }
+    
+    CGRect drawingRect = CGRectMake(0.f, 0.f, imageSize.width, imageSize.height);
+    CGContextDrawImage(rotatedContext, drawingRect, originalCGImage);
+    CGImageRef rotatedCGImage = CGBitmapContextCreateImage(rotatedContext);
+    
+    UIGraphicsEndImageContext();
+    CFAutorelease((CFTypeRef)rotatedCGImage);
+    
+    return rotatedCGImage;
+}
 
 - (void) invokeTakePicture:(CGFloat) maxWidth withHeight:(CGFloat) maxHeight {
         AVCaptureConnection *connection = [self.sessionManager.stillImageOutput connectionWithMediaType:AVMediaTypeVideo];
@@ -309,7 +374,14 @@
                 __block NSString *originalPicturePath;
                 NSString *fileName = [[[NSUUID UUID] UUIDString] stringByAppendingString:@".jpg"];
                 CIContext *context = [CIContext contextWithOptions:nil];
-                UIImage *saveUIImage = [UIImage imageWithCGImage:[context createCGImage:finalCImage fromRect:finalCImage.extent]];
+                
+                UIImage *resultImage = [UIImage imageWithCGImage:finalImage];
+                    
+                CFRelease(finalImage);
+                    
+                double radiants = [weakSelf radiansFromUIImageOrientation:resultImage.imageOrientation];
+                CGImageRef resultFinalImage = [weakSelf CGImageRotated:finalImage withRadiants:radiants];
+                UIImage *saveUIImage = [UIImage imageWithCGImage:[context createCGImage:resultFinalImage fromRect:resultFinalImage.extent]];
                 originalPicturePath = [CameraPreview saveImage: saveUIImage withName: fileName];
 
                 NSLog(originalPicturePath);
