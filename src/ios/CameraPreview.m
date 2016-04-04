@@ -324,6 +324,9 @@
 
 - (void) invokeTakePicture:(CGFloat) maxWidth withHeight:(CGFloat) maxHeight {
         AVCaptureConnection *connection = [self.sessionManager.stillImageOutput connectionWithMediaType:AVMediaTypeVideo];
+        __weak CameraRenderController *weakRenderController = self.cameraRenderController;
+        __weak CameraSessionManager *weakSessionManager = self.sessionManager;
+        __weak CameraPreview *weakSelf = self;
         [self.sessionManager.stillImageOutput captureStillImageAsynchronouslyFromConnection:connection completionHandler:^(CMSampleBufferRef sampleBuffer, NSError *error) {
             NSLog(@"Done creating still image");
 
