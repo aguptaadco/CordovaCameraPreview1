@@ -17,7 +17,7 @@ CameraPreview.startCamera = function(rect, defaultCamera, tapEnabled, dragEnable
   exec(onSuccess, onError, PLUGIN_NAME, "startCamera", [rect.x, rect.y, rect.width, rect.height, defaultCamera, !!tapEnabled, !!dragEnabled, !!toBack, alpha]);
 };
 CameraPreview.stopCamera = function(callback) {
-  exec(callback, null, PLUGIN_NAME, "stopCamera", []);
+  exec(callback, callback, PLUGIN_NAME, "stopCamera", []);
 };
 //@param size {maxWidth: 100, maxHeight:100}
 CameraPreview.takePicture = function(size, onSuccess, onError) {
