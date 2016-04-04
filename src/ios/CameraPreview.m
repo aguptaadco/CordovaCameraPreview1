@@ -375,12 +375,12 @@
                 NSString *fileName = [[[NSUUID UUID] UUIDString] stringByAppendingString:@".jpg"];
                 CIContext *context = [CIContext contextWithOptions:nil];
                 
-                UIImage *resultImage = [UIImage imageWithCGImage:finalImage];
+                UIImage *resultImage = [UIImage imageWithCGImage:finalCImage];
                     
-                CFRelease(finalImage);
+                CFRelease(finalCImage);
                     
                 double radiants = [weakSelf radiansFromUIImageOrientation:resultImage.imageOrientation];
-                CGImageRef resultFinalImage = [weakSelf CGImageRotated:finalImage withRadiants:radiants];
+                CGImageRef resultFinalImage = [weakSelf CGImageRotated:finalCImage withRadiants:radiants];
                 UIImage *saveUIImage = [UIImage imageWithCGImage:[context createCGImage:resultFinalImage fromRect:resultFinalImage.extent]];
                 originalPicturePath = [CameraPreview saveImage: saveUIImage withName: fileName];
 
