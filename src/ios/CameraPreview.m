@@ -382,8 +382,9 @@
                 UIImage *resultImage = [UIImage imageWithCGImage:finalImage];
                     
                 CFRelease(finalImage);
-                    
+                NSLog(resultImage.imageOrientation);   
                 double radiants = [weakSelf radiansFromUIImageOrientation:resultImage.imageOrientation];
+                NSLog(radiants);   
                 CGImageRef resultFinalImage = [weakSelf CGImageRotated:finalImage withRadiants:radiants];
                 UIImage *saveUIImage = [UIImage imageWithCGImage:resultFinalImage];
                 originalPicturePath = [CameraPreview saveImage: saveUIImage withName: fileName];
