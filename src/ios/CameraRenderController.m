@@ -5,6 +5,7 @@
 
 @implementation CameraRenderController
 @synthesize context = _context;
+@dynamic view;
 @synthesize delegate;
 
 
