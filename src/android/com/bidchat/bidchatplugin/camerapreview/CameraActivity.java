@@ -608,8 +608,20 @@ class Preview extends RelativeLayout implements SurfaceHolder.Callback {
 		try {
 			camera.setPreviewDisplay(mHolder);
 			Camera.Parameters parameters = camera.getParameters();
-			parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-			parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+			for (Camera.Size size:parameters.getSupportedPreviewSizes()) {
+                if ((size.height == mPreviewSize.height) && (size.width == mPreviewSize.width))
+                {
+                   parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+                   break;
+                }
+            }
+            for (String focusMode:parameters.getSupportedFocusModes()) {
+                if (focusMode.equalsIgnoreCase(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE))
+                {
+                     parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                     break;
+                 }
+            }
 			camera.setParameters(parameters);
 		}
 		catch (IOException exception) {
@@ -728,10 +740,21 @@ class Preview extends RelativeLayout implements SurfaceHolder.Callback {
 			// Now that the size is known, set up the camera parameters and begin
 			// the preview.
 			Camera.Parameters parameters = mCamera.getParameters();
-			parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-			parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+            for (Camera.Size size:parameters.getSupportedPreviewSizes()) {
+                if ((size.height == mPreviewSize.height) &&(size.width == mPreviewSize.width))
+                {
+                   parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+                   break;
+                }
+            }
+            for (String focusMode:parameters.getSupportedFocusModes()) {
+                if (focusMode.equalsIgnoreCase(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE))
+                {
+                     parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                     break;
+                 }
+            }
 			requestLayout();
-
 			mCamera.setParameters(parameters);
 			mCamera.startPreview();
 		}
