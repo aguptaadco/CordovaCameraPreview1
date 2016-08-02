@@ -19,19 +19,13 @@ Show camera preview popup on top of the HTML.<br/>
 <p><b>Installation:</b></p>
 
 ```
-cordova plugin add https://github.com/mbppower/CordovaCameraPreview.git
-```
-
-<b>Phonegap Build:</b><br/>
-
-```
-<gap:plugin name="com.mbppower.camerapreview" version="0.0.8" source="plugins.cordova.io" />
+cordova plugin add https://github.com/aguptaadco/CordovaCameraPreview.git
 ```
 
 <p><b>Methods:</b></p>
 
 
-  <b>startCamera(rect, defaultCamera, tapEnabled, dragEnabled, toBack)</b><br/>
+  <b>startCamera(rect, defaultCamera, tapEnabled, dragEnabled, toBack, alpha, onSuccess, onError)</b><br/>
   <info>
   	Starts the camera preview instance.
   	<br/>
@@ -49,7 +43,15 @@ var tapEnabled = true; //enable tap take picture
 var dragEnabled = true; //enable preview box drag across the screen
 var toBack = true; //send preview box to the back of the webview
 var rect = {x: 100, y: 100, width: 200, height:200};
-cordova.plugins.camerapreview.startCamera(rect, "front", tapEnabled, dragEnabled, toBack)
+var alpha = 1;
+var onSuccess = function(message){
+    console.log(message);
+    // Do Something after Camera Started 
+}
+var onError = function(message){
+    console.log(message);
+}
+cordova.plugins.camerapreview.startCamera(rect, "front", tapEnabled, dragEnabled, toBack, onSuccess, onError)
 ```
 
 <b>stopCamera()</b><br/>

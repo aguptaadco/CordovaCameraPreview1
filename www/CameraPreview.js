@@ -13,8 +13,16 @@ CameraPreview.setOnPictureTakenHandler = function(onPictureTaken) {
 //@param rect {x: 0, y: 0, width: 100, height:100}
 //@param defaultCamera "front" | "back"
 CameraPreview.startCamera = function(rect, defaultCamera, tapEnabled, dragEnabled, toBack, alpha, onSuccess, onError) {
+//  if (typeof(alpha) === 'undefined') alpha = 1;
+//  exec(onSuccess, onError, PLUGIN_NAME, "startCamera", [rect.x, rect.y, rect.width, rect.height, defaultCamera, !!tapEnabled, !!dragEnabled, !!toBack, alpha]);
+    
   if (typeof(alpha) === 'undefined') alpha = 1;
-  exec(onSuccess, onError, PLUGIN_NAME, "startCamera", [rect.x, rect.y, rect.width, rect.height, defaultCamera, !!tapEnabled, !!dragEnabled, !!toBack, alpha]);
+  var storeToGallery = false;
+  var compression = 80;
+//  if (typeof(storeToGallery) !== 'boolean') storeToGallery = false;
+//  if (typeof(compression) === 'undefined') compression = 80; // 0-100. 100 => least amount of compression.
+  exec(onSuccess, onError, PLUGIN_NAME, "startCamera", [rect.x, rect.y, rect.width, rect.height, defaultCamera, !!tapEnabled, !!dragEnabled, !!toBack, alpha, !!storeToGallery, compression]);
+
 };
 CameraPreview.stopCamera = function(callback) {
   exec(callback, callback, PLUGIN_NAME, "stopCamera", []);
@@ -27,7 +35,9 @@ CameraPreview.takePicture = function(size, onSuccess, onError) {
   }
   exec(onSuccess, onError, PLUGIN_NAME, "takePicture", params);
 };
-
+CameraPreview.focusCamera = function(onSuccess, onError) {
+  exec(onSuccess, onError, PLUGIN_NAME, "focusCamera", []);
+};
 CameraPreview.setColorEffect = function(effect, onSuccess, onError) {
   exec(onSuccess, onError, PLUGIN_NAME, "setColorEffect", [effect]);
 };
@@ -46,6 +56,16 @@ CameraPreview.show = function(onSuccess, onError) {
 
 CameraPreview.disable = function(disable, onSuccess, onError) {
   exec(onSuccess, onError, PLUGIN_NAME, "disable", [disable]);
+};
+
+CameraPreview.flashOn = function(onSuccess, onError) {
+  exec(onSuccess, onError, PLUGIN_NAME, "flashMode", ["on"]);
+};
+CameraPreview.flashOff = function(onSuccess, onError) {
+  exec(onSuccess, onError, PLUGIN_NAME, "flashMode", ["off"]);
+};
+CameraPreview.flashAuto = function(onSuccess, onError) {
+  exec(onSuccess, onError, PLUGIN_NAME, "flashMode", ["auto"]);
 };
 
 module.exports = CameraPreview;
